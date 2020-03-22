@@ -8,8 +8,10 @@ import scala.concurrent.duration._
 object ConsumerApp extends IOApp {
 
   val consumerSettings =
-    ConsumerSettings(keyDeserializer = Deserializer[IO, String], valueDeserializer = Deserializer[IO, String])
-      .withAutoOffsetReset(AutoOffsetReset.Earliest)
+    ConsumerSettings(
+      keyDeserializer = Deserializer[IO, String],
+      valueDeserializer = Deserializer[IO, String]
+    ).withAutoOffsetReset(AutoOffsetReset.Earliest)
       .withBootstrapServers("localhost:29092")
       .withGroupId("group")
 
