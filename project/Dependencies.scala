@@ -26,4 +26,5 @@ object Dependencies {
   lazy val catsEffectTest = "com.codecommit" %% "cats-effect-testing-scalatest" % "0.4.0"
   lazy val mockito = "org.mockito" %% "mockito-scala" % mockitoVersion
   lazy val mockitoScalatest = "org.mockito" %% "mockito-scala-scalatest" % mockitoVersion
+  lazy val kafkaEmbedded = "io.github.embeddedkafka" %% "embedded-kafka" % "2.4.0"
 }

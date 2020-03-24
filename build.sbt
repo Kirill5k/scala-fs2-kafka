@@ -18,7 +18,8 @@ lazy val root = (project in file("."))
       redisCats,
       scalaTest % Test,
       catsEffectTest % Test,
-      mockito % Test, mockitoScalatest % Test
+      mockito % Test, mockitoScalatest % Test,
+      kafkaEmbedded % Test
     )
   )
 
