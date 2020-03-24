@@ -9,8 +9,16 @@ lazy val root = (project in file("."))
   .settings(
     name := "scala-fs2-kafka",
     libraryDependencies ++= Seq(
+      logbackClassic,
+      scalaLogging,
+      pureConfig, pureConfigCats,
+      catsCore, catsEffect,
+      circeCore, circeGeneric, circeParser,
       fs2Kafka,
-      scalaTest % Test
+      redisCats,
+      scalaTest % Test,
+      catsEffectTest % Test,
+      mockito % Test, mockitoScalatest % Test
     )
   )
 
