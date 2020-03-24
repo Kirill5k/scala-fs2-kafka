@@ -9,8 +9,7 @@ final case class KafkaConsumerConfig(
                                       host: String,
                                       port: Int,
                                       groupId: String,
-                                      autoOffsetReset: String,
-                                      topic: String
+                                      autoOffsetReset: String
                                     )
 
 final case class KafkaConfig(producer: KafkaProducerConfig, consumer: KafkaConsumerConfig)
