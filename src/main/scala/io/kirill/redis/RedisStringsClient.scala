@@ -23,18 +23,10 @@ class RedisStringsClient[F[_]: ConcurrentEffect: ContextShift: Logger] private (
 
 
   def put(key: String, value: String): F[Unit] =
-    commandsApi.use { cmd =>
-      for {
-        _ <- cmd.set(key, value)
-      } yield ()
-    }
+    commandsApi.use(_.set(key, value))
 
   def get(key: String): F[Option[String]] =
-    commandsApi.use { cmd =>
-      for {
-        value <- cmd.get(key)
-      } yield value
-    }
+    commandsApi.use(_.get(key))
 }
 
 object RedisStringsClient {
