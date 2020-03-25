@@ -15,8 +15,8 @@ class KafkaMessageConsumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] pr
     ) {
 
   private val autoOffsetReset = config.autoOffsetReset match {
-    case "Latest" => AutoOffsetReset.Latest
-    case "Earliest" => AutoOffsetReset.Earliest
+    case "Latest" | "latest" => AutoOffsetReset.Latest
+    case "Earliest" | "earliest" => AutoOffsetReset.Earliest
     case _ => AutoOffsetReset.None
   }
 
@@ -25,6 +25,7 @@ class KafkaMessageConsumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] pr
       .withAutoOffsetReset(autoOffsetReset)
       .withBootstrapServers(s"${config.host}:${config.port}")
       .withGroupId(config.groupId)
+      .withEnableAutoCommit(true)
 
   def streamFrom(topic: String): fs2.Stream[F, ConsumerRecord[K, V]] =
     consumerStream(settings)
