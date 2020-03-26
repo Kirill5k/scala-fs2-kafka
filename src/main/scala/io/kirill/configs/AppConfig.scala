@@ -8,6 +8,8 @@ import pureconfig.module.catseffect.syntax._
 final case class AppConfig(kafka: KafkaConfig, redis: RedisConfig)
 
 object AppConfig {
+  implicit val appConfig: AppConfig = ConfigSource.default.loadOrThrow[AppConfig]
+
   def load(blocker: Blocker)(implicit cs: ContextShift[IO]): IO[AppConfig] = {
     ConfigSource.default.loadF[IO, AppConfig](blocker)
   }

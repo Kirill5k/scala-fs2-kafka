@@ -16,5 +16,11 @@ class AppConfigSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
 
       config.asserting(_ mustBe a [AppConfig])
     }
+
+    "should be implicitly imported" in {
+      import AppConfig._
+
+      IO(appConfig).asserting(_ mustBe a [AppConfig])
+    }
   }
 }
