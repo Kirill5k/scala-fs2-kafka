@@ -18,6 +18,9 @@ object Dependencies {
   lazy val catsCore = "org.typelevel" %% "cats-core" % "2.1.0"
   lazy val catsEffect = "org.typelevel" %% "cats-effect" % "2.1.2"
 
+  lazy val kafkaAvro = "io.confluent" % "kafka-avro-serializer" % "5.4.0"
+  lazy val avro = "org.apache.avro" % "avro" % "1.9.1"
+
   lazy val fs2Kafka = "com.github.fd4s" %% "fs2-kafka" % "1.0.0"
 
   lazy val redisCats = "dev.profunktor" %% "redis4cats-effects" % redisCatsVersion

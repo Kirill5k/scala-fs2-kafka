@@ -13,6 +13,7 @@ lazy val root = (project in file("."))
       pureConfig, pureConfigCats,
       catsCore, catsEffect,
       circeCore, circeGeneric, circeParser,
+      avro, kafkaAvro,
       fs2Kafka,
       redisCats, redisCatsLogging,
       scalaTest % Test,
@@ -20,6 +21,9 @@ lazy val root = (project in file("."))
       mockito % Test, mockitoScalatest % Test,
       kafkaEmbedded % Test,
       redisEmbedded % Test
+    ),
+    resolvers ++= Seq(
+      "io.confluent" at "https://packages.confluent.io/maven/"
     )
   )
 
