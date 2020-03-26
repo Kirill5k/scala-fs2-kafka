@@ -23,7 +23,7 @@ class KafkaMessageConsumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] pr
   private val settings =
     ConsumerSettings[F, K, V](keyDeserializer = kd, valueDeserializer = vd)
       .withAutoOffsetReset(autoOffsetReset)
-      .withBootstrapServers(s"${config.host}:${config.port}")
+      .withBootstrapServers(config.bootstrapServers)
       .withGroupId(config.groupId)
       .withEnableAutoCommit(true)
 

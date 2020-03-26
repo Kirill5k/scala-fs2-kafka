@@ -1,17 +1,15 @@
 package io.kirill.configs
 
-final case class KafkaProducerConfig(
-                                      host: String,
-                                      port: Int
-                                    )
+final case class KafkaProducerConfig(bootstrapServers: String)
 
 final case class KafkaConsumerConfig(
-                                      host: String,
-                                      port: Int,
+                                      bootstrapServers: String,
                                       groupId: String,
                                       autoOffsetReset: String
                                     )
 
-final case class KafkaConfig(producer: KafkaProducerConfig, consumer: KafkaConsumerConfig)
+final case class KafkaSchemaConfig(schemaRegistryUrl: String)
+
+final case class KafkaConfig(producer: KafkaProducerConfig, consumer: KafkaConsumerConfig, schema: KafkaSchemaConfig)
 
 

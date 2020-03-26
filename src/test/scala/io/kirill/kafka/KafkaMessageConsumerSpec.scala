@@ -20,7 +20,7 @@ class KafkaMessageConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKa
 
   val topic = "topic.test"
 
-  val consumerConfig: KafkaConsumerConfig = KafkaConsumerConfig("localhost", 29092, "group-1", "Earliest")
+  val consumerConfig: KafkaConsumerConfig = KafkaConsumerConfig("localhost:29092", "group-1", "Earliest")
 
   "A KafkaMessageConsumer" should {
 

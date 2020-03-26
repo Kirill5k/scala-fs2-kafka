@@ -19,7 +19,7 @@ class KafkaMessageProducerSpec extends AnyWordSpec with Matchers with EmbeddedKa
 
   val topic = "topic.test"
 
-  val producerConfig: KafkaProducerConfig = KafkaProducerConfig("localhost", 39092)
+  val producerConfig: KafkaProducerConfig = KafkaProducerConfig("localhost:39092")
 
   "A KafkaMessageProducer" should {
 

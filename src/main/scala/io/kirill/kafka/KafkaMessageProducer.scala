@@ -11,7 +11,7 @@ import io.kirill.event.Event
 class KafkaMessageProducer[F[_]: ConcurrentEffect: ContextShift, K, V] private(config: KafkaProducerConfig)(implicit ks: Serializer[F, K], vs: Serializer[F, V]) {
 
   private val settings: ProducerSettings[F, K, V] = ProducerSettings(keySerializer = ks, valueSerializer = vs)
-    .withBootstrapServers(s"${config.host}:${config.port}")
+    .withBootstrapServers(config.bootstrapServers)
 
   def streamTo(topic: String): Pipe[F, (K, V), Unit] = inputStream =>
     inputStream
