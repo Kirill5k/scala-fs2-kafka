@@ -35,6 +35,15 @@ class KafkaMessageConsumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] pr
       .evalTap(_.subscribeTo(topic))
       .flatMap(_.stream)
       .evalMap(commitable => Sync[F].pure(commitable.record))
+
+  def streamFromPartitioned[V1](topic: String)(processingPipe: fs2.Pipe[F, ConsumerRecord[K, V], V1]): fs2.Stream[F, V1] =
+    consumerStream(settings)
+      .evalTap(_.subscribeTo(topic))
+      .flatMap(_.partitionedStream)
+      .map { partitionStream =>
+        partitionStream.map(_.record).through(processingPipe)
+      }
+      .parJoinUnbounded
 }
 
 object KafkaMessageConsumer {
