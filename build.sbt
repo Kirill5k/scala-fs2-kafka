@@ -15,6 +15,7 @@ lazy val root = (project in file("."))
       circeCore, circeGeneric, circeParser,
       avro, kafkaAvro,
       fs2Kafka,
+      kafkaStreams,
       redisCats, redisCatsLogging,
       scalaTest % Test,
       catsEffectTest % Test,

@@ -20,7 +20,7 @@ object Dependencies {
   lazy val catsCore = "org.typelevel" %% "cats-core" % "2.1.0"
   lazy val catsEffect = "org.typelevel" %% "cats-effect" % "2.1.2"
 
-  lazy val kafkaStreams = "org.apache.kafka" % "kafka-streams" % kafkaVersion
+  lazy val kafkaStreams = "org.apache.kafka" %% "kafka-streams-scala" % kafkaVersion
   lazy val kafkaAvro = "io.confluent" % "kafka-avro-serializer" % confluentVersion
   lazy val avro = "org.apache.avro" % "avro" % "1.9.1"
 
