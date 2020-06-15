@@ -7,9 +7,11 @@ import cats.implicits._
 import org.apache.kafka.streams.KafkaStreams.State
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 import org.apache.kafka.streams.scala.StreamsBuilder
+import org.apache.kafka.streams.scala.kstream.KStream
 
-
-final class KafkaMessageStreams[F[_]: Async] (private val streams: KafkaStreams) {
+final class KafkaMessageStreams[F[_]: Async](
+    private val streams: KafkaStreams
+) {
 
   def state(): F[State] =
     Async[F].delay(streams.state())
@@ -20,14 +22,11 @@ final class KafkaMessageStreams[F[_]: Async] (private val streams: KafkaStreams)
   def close(): F[Unit] =
     state().flatMap {
       case State.RUNNING => Async[F].delay(streams.close())
-      case _ => Async[F].unit
+      case _             => Async[F].unit
     }
 }
 
-final class KafkaStreamsTopology {
-  val builder: StreamsBuilder = new StreamsBuilder
-
-}
+final class KafkaStreamsTopology[K, V](val builder: StreamsBuilder, val origin: KStream[K, V]) {}
 
 object KafkaMessageStreams {
 
