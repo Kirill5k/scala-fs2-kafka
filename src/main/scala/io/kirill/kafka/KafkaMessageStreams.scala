@@ -2,12 +2,12 @@ package io.kirill.kafka
 
 import java.util.Properties
 
-import cats.effect.{Async, Sync}
+import cats.effect.Async
 import cats.implicits._
 import org.apache.kafka.streams.KafkaStreams.State
-import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 import org.apache.kafka.streams.scala.StreamsBuilder
 import org.apache.kafka.streams.scala.kstream.KStream
+import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 
 final class KafkaMessageStreams[F[_]: Async](
     private val streams: KafkaStreams
@@ -26,12 +26,14 @@ final class KafkaMessageStreams[F[_]: Async](
     }
 }
 
-final class KafkaStreamsTopology[F[_]: Sync, K, V](
+final class KafkaStreamsTopology[K, V](
     private val builder: StreamsBuilder,
-    private val origin: KStream[K, V]
+    private val origin: KStream[K, V],
+    private val current: KStream[K, V]
 ) {
 
-  def filter(p: (K, V) => F[Boolean]): KafkaStreamsTopology[F, K, V] = ???
+  def filter(p: (K, V) => Boolean): KafkaStreamsTopology[K, V] =
+    new KafkaStreamsTopology[K, V](builder, origin, current.filter(p))
 }
 
 object KafkaMessageStreams {
