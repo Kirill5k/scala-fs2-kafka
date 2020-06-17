@@ -17,7 +17,7 @@ class KafkaMessageStreamsSpec extends AsyncFreeSpec with Matchers with AsyncMock
 
         when(kafkaStreams.state()).thenReturn(KafkaStreams.State.RUNNING)
 
-        streams.close().unsafeToFuture().map { res =>
+        streams.stop().unsafeToFuture().map { res =>
           verify(kafkaStreams).close()
           res must be (())
         }
@@ -29,7 +29,7 @@ class KafkaMessageStreamsSpec extends AsyncFreeSpec with Matchers with AsyncMock
 
         when(kafkaStreams.state()).thenReturn(KafkaStreams.State.REBALANCING)
 
-        streams.close().unsafeToFuture().map { res =>
+        streams.stop().unsafeToFuture().map { res =>
           verify(kafkaStreams, never).close()
           res must be (())
         }
