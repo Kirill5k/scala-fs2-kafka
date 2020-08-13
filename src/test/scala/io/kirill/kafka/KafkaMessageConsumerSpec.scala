@@ -1,7 +1,7 @@
 package io.kirill.kafka
 
 import cats.effect._
-import io.kirill.configs.KafkaConsumerConfig
+import io.kirill.configs.{KafkaConfig, KafkaConsumerConfig}
 import io.kirill.event.Event
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.kafka.common.serialization.StringSerializer
@@ -20,7 +20,7 @@ class KafkaMessageConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKa
 
   val topic = "topic.test"
 
-  val consumerConfig: KafkaConsumerConfig = KafkaConsumerConfig("localhost:29092", "group-1", "Earliest")
+  val config = KafkaConfig("localhost:29092", "app-1", "group-1", "http://localhost:8081", "earliest")
 
   "A KafkaMessageConsumer" should {
 
@@ -29,7 +29,7 @@ class KafkaMessageConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKa
         val messagesToPublish = List("Hello", "World", "and", "kafka")
         messagesToPublish.foreach(m => publishToKafka[String, String](topic, "key", m))
 
-        val consumer = KafkaMessageConsumer[IO, String, String](consumerConfig)
+        val consumer = KafkaMessageConsumer[IO, String, String](config)
 
         val receivedMessages = consumer.streamFrom(topic).evalMap(rec => IO.pure(rec.value)).take(4).compile.toList.unsafeRunSync
         receivedMessages must contain theSameElementsAs messagesToPublish
@@ -47,7 +47,7 @@ class KafkaMessageConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKa
         )
         eventsToPublish.foreach(m => publishToKafka[String, String](topic, "key", m))
 
-        val consumer = KafkaMessageConsumer[IO, String, Event](consumerConfig)
+        val consumer = KafkaMessageConsumer[IO, String, Event](config)
 
         val receivedMessages = consumer.streamFrom(topic).evalMap(rec => IO.pure(rec.value)).take(3).compile.toList.unsafeRunSync()
         receivedMessages must be (List(Event("e1", "event 1"), Event("e2", "event 2"), Event("e3", "event 3")))

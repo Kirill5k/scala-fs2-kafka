@@ -1,32 +1,33 @@
 package io.kirill.kafka
 
 import cats.effect._
-import fs2.kafka.{AutoOffsetReset, ConsumerRecord, ConsumerSettings, Deserializer, KafkaDeserializer, consumerStream}
-import io.kirill.configs.{AppConfig, KafkaConsumerConfig}
-import io.kirill.event.Event
+import fs2.kafka._
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
+import io.kirill.configs.KafkaConfig
+import io.kirill.event.Event
 import org.apache.avro.generic.GenericRecord
 
 import scala.jdk.CollectionConverters._
 
 class KafkaMessageConsumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] private (
-      config: KafkaConsumerConfig
-    )(
-      implicit kd: Deserializer[F, K], vd: Deserializer[F, V]
-    ) {
+    config: KafkaConfig
+)(
+    implicit kd: Deserializer[F, K],
+    vd: Deserializer[F, V]
+) {
 
-  private val autoOffsetReset = config.autoOffsetReset match {
-    case "Latest" | "latest" => AutoOffsetReset.Latest
+  private val autoOffsetReset = config.offset match {
+    case "Latest" | "latest"     => AutoOffsetReset.Latest
     case "Earliest" | "earliest" => AutoOffsetReset.Earliest
-    case _ => AutoOffsetReset.None
+    case _                       => AutoOffsetReset.None
   }
 
   private val settings =
     ConsumerSettings[F, K, V](keyDeserializer = kd, valueDeserializer = vd)
       .withAutoOffsetReset(autoOffsetReset)
-      .withBootstrapServers(config.bootstrapServers)
+      .withBootstrapServers(config.servers)
       .withGroupId(config.groupId)
       .withEnableAutoCommit(true)
 
@@ -47,26 +48,30 @@ class KafkaMessageConsumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] pr
 }
 
 object KafkaMessageConsumer {
-  implicit def eventDeserializer[F[_]](implicit s: Sync[F]): Deserializer[F, Event] = Deserializer.instance {
-    (_, _, bytes) => s.fromEither(decode[Event](bytes.map(_.toChar).mkString))
+  implicit def eventDeserializer[F[_]: Sync]: Deserializer[F, Event] = Deserializer.instance { (_, _, bytes) =>
+    Sync[F].fromEither(decode[Event](bytes.map(_.toChar).mkString))
   }
 
-  implicit def genericAvroDeserializer[F[_]](implicit s: Sync[F], config: AppConfig): Deserializer[F, GenericRecord] =
+  implicit def genericAvroDeserializer[F[_]: Sync](implicit config: KafkaConfig): Deserializer[F, GenericRecord] =
     Deserializer.delegate[F, GenericRecord](
       new KafkaDeserializer[GenericRecord] {
         private val avroDeserializer = new KafkaAvroDeserializer()
         private val deserializerConf = Map(
-          "schema.registry.url" -> config.kafka.schema.schemaRegistryUrl,
+          "schema.registry.url"  -> config.schemaRegistryUrl,
           "specific.avro.reader" -> true.asInstanceOf[java.lang.Boolean]
         )
         avroDeserializer.configure(deserializerConf.asJava, false)
 
-        override def deserialize(topic: String, data: Array[Byte]): GenericRecord = {
+        override def deserialize(topic: String, data: Array[Byte]): GenericRecord =
           avroDeserializer.deserialize(topic, data).asInstanceOf[GenericRecord]
-        }
       }
     )
 
-  def apply[F[_]: Timer: ConcurrentEffect: ContextShift, K, V](config: KafkaConsumerConfig)(implicit kd: Deserializer[F, K], vd: Deserializer[F, V]): KafkaMessageConsumer[F, K, V] =
+  def apply[F[_]: Timer: ConcurrentEffect: ContextShift, K, V](
+      config: KafkaConfig
+  )(
+      implicit kd: Deserializer[F, K],
+      vd: Deserializer[F, V]
+  ): KafkaMessageConsumer[F, K, V] =
     new KafkaMessageConsumer(config)
 }
