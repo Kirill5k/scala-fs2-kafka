@@ -1,8 +1,8 @@
 import Dependencies._
 
-ThisBuild / scalaVersion     := "2.13.1"
-ThisBuild / version          := "0.1.0-SNAPSHOT"
-ThisBuild / organization     := "io.kirill"
+ThisBuild / scalaVersion := "2.13.1"
+ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / organization := "io.kirill"
 ThisBuild / organizationName := "kirill"
 
 lazy val root = (project in file("."))
@@ -17,6 +17,11 @@ lazy val root = (project in file("."))
       fs2Kafka,
       kafkaStreams,
       redisCats, redisCatsLogging,
+      http4sCore,
+      http4sDsl,
+      http4sServer,
+      http4sClient,
+      http4sCirce,
       scalaTest % Test,
       catsEffectTest % Test,
       mockito % Test, mockitoScalatest % Test,
