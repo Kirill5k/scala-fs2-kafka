@@ -16,20 +16,20 @@ import org.apache.kafka.streams.scala.kstream.{Consumed, KStream, Produced}
 import org.apache.kafka.streams.state.{KeyValueStore, StoreBuilder}
 import org.apache.kafka.streams.{KafkaStreams, StreamsConfig}
 
-final class KafkaMessageStreams[F[_]: Async](
+final class KafkaMessageStreams[F[_]: Sync](
     private val streams: KafkaStreams
 ) {
 
   def state(): F[State] =
-    Async[F].delay(streams.state())
+    Sync[F].delay(streams.state())
 
   def start(): F[Unit] =
     Sync[F].delay[Unit](streams.start())
 
   def stop(): F[Unit] =
     state().flatMap {
-      case s if s.isRunningOrRebalancing => Async[F].delay(streams.close())
-      case _                             => Async[F].unit
+      case s if s.isRunningOrRebalancing => Sync[F].delay(streams.close())
+      case _                             => Sync[F].unit
     }
 }
 
