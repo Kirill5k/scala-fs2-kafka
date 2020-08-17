@@ -5,6 +5,11 @@ import pureconfig._
 import pureconfig.generic.auto._
 import pureconfig.module.catseffect.syntax._
 
+final case class ServerConfig(
+    host: String,
+    port: Int
+)
+
 final case class KafkaConfig(
     servers: String,
     appId: String,
@@ -13,7 +18,11 @@ final case class KafkaConfig(
     offset: String
 )
 
-final case class AppConfig(kafka: KafkaConfig, redis: RedisConfig)
+final case class AppConfig(
+    kafka: KafkaConfig,
+    redis: RedisConfig,
+    server: ServerConfig
+)
 
 object AppConfig {
   implicit val appConfig: AppConfig = ConfigSource.default.loadOrThrow[AppConfig]

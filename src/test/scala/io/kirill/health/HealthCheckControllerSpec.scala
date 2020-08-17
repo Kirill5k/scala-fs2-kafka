@@ -27,16 +27,14 @@ class HealthCheckControllerSpec extends AnyWordSpec with Matchers with MockitoSu
 
       when(healthCheckServiceMock.status).thenReturn(IO.pure(AppStatus(StreamStatus(true))))
 
-      val request                    = Request[IO](uri = uri"/healthcheck/status")
+      val request                    = Request[IO](uri = uri"/health/status")
       val response: IO[Response[IO]] = controller.routes.orNotFound.run(request)
 
       verifyResponse[HealthCheckResponse](response, Status.Ok, Some(HealthCheckResponse("up")))
     }
   }
 
-  def verifyResponse[A: Encoder](actual: IO[Response[IO]], expectedStatus: Status, expectedBody: Option[A] = None)(
-    implicit ev: EntityDecoder[IO, A]
-  ): Unit = {
+  def verifyResponse[A: Encoder](actual: IO[Response[IO]], expectedStatus: Status, expectedBody: Option[A] = None): Unit = {
     val actualResp = actual.unsafeRunSync
 
     actualResp.status must be(expectedStatus)

@@ -33,8 +33,6 @@ final class HealthCheckController[F[_]: Sync](
 }
 
 object HealthCheckController {
-  implicit def deriveEntityEncoder[F[_]: Sync, A: Encoder]: EntityEncoder[F, A] = jsonEncoderOf[F, A]
-  implicit def deriveEntityDecoder[F[_]: Sync, A: Decoder]: EntityDecoder[F, A] = jsonOf[F, A]
 
   final case class HealthCheckResponse(stream: String)
 

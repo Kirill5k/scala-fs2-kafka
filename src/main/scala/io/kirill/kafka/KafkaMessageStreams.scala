@@ -24,7 +24,7 @@ final class KafkaMessageStreams[F[_]: Async](
     Async[F].delay(streams.state())
 
   def start(): F[Unit] =
-    Async[F].async[Unit](_ => streams.start())
+    Sync[F].delay[Unit](streams.start())
 
   def stop(): F[Unit] =
     state().flatMap {
