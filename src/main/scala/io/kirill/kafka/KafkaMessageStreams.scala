@@ -69,7 +69,19 @@ final class KafkaMessageStreamsTopology[K1, V1, K2, V2](
     new KafkaMessageStreamsTopology[K1, V1, K1, V1](builder, source, source)
   }
 
-  def make[F[_]: Async](implicit config: KafkaConfig): Resource[F, KafkaMessageStreams[F]] = {
+  def repartitionWithNewKey(
+      f: (K2, V2) => K2,
+      passThroughTopic: String
+  )(
+      implicit serdes: Produced[K2, V2]
+  ): KafkaMessageStreamsTopology[K1, V1, K2, V2] =
+    new KafkaMessageStreamsTopology[K1, V1, K2, V2](
+      builder,
+      source,
+      sink.selectKey(f).through(passThroughTopic)
+    )
+
+  def make[F[_]: Sync](implicit config: KafkaConfig): Resource[F, KafkaMessageStreams[F]] = {
     val props                = KafkaMessageStreams.props(config)
     val stream: KafkaStreams = new KafkaStreams(builder.build(), props)
     stream.setUncaughtExceptionHandler((_, e) => logger.error(s"error during stream operation: ${e.getMessage}", e))
