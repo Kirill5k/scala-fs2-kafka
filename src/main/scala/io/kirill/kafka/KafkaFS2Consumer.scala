@@ -11,7 +11,7 @@ import org.apache.avro.generic.GenericRecord
 
 import scala.jdk.CollectionConverters._
 
-class KafkaMessageConsumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] private (
+class KafkaFS2Consumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] private(
     config: KafkaConfig
 )(
     implicit kd: Deserializer[F, K],
@@ -47,7 +47,7 @@ class KafkaMessageConsumer[F[_]: Timer: ConcurrentEffect: ContextShift, K, V] pr
       .parJoinUnbounded
 }
 
-object KafkaMessageConsumer {
+object KafkaFS2Consumer {
   implicit def eventDeserializer[F[_]: Sync]: Deserializer[F, Event] = Deserializer.instance { (_, _, bytes) =>
     Sync[F].fromEither(decode[Event](bytes.map(_.toChar).mkString))
   }
@@ -72,6 +72,6 @@ object KafkaMessageConsumer {
   )(
       implicit kd: Deserializer[F, K],
       vd: Deserializer[F, V]
-  ): KafkaMessageConsumer[F, K, V] =
-    new KafkaMessageConsumer(config)
+  ): KafkaFS2Consumer[F, K, V] =
+    new KafkaFS2Consumer(config)
 }

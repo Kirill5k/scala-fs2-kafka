@@ -10,7 +10,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import scala.concurrent.ExecutionContext
 
-class KafkaMessageProducerSpec extends AnyWordSpec with Matchers with EmbeddedKafka {
+class KafkaFS2ProducerSpec extends AnyWordSpec with Matchers with EmbeddedKafka {
   val ex: ExecutionContext = ExecutionContext.Implicits.global
   implicit val cs: ContextShift[IO] = IO.contextShift(ex)
   implicit val t: Timer[IO] = IO.timer(ex)
@@ -45,7 +45,7 @@ class KafkaMessageProducerSpec extends AnyWordSpec with Matchers with EmbeddedKa
     }
 
     "publish stream of event objects" in {
-      import KafkaMessageProducer._
+      import KafkaFS2Producer._
       withRunningKafkaOnFoundPort(embeddedKafkaConfig) { _ =>
         val producer = KafkaMessageProducer[IO, String, Event](config)
 

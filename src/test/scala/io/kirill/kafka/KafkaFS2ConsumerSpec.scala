@@ -11,7 +11,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import scala.concurrent.ExecutionContext
 
-class KafkaMessageConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKafka {
+class KafkaFS2ConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKafka {
   implicit val ss = new StringSerializer
   val ex: ExecutionContext = ExecutionContext.Implicits.global
   implicit val cs: ContextShift[IO] = IO.contextShift(ex)
@@ -29,7 +29,7 @@ class KafkaMessageConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKa
         val messagesToPublish = List("Hello", "World", "and", "kafka")
         messagesToPublish.foreach(m => publishToKafka[String, String](topic, "key", m))
 
-        val consumer = KafkaMessageConsumer[IO, String, String](config)
+        val consumer = KafkaFS2Consumer[IO, String, String](config)
 
         val receivedMessages = consumer.streamFrom(topic).evalMap(rec => IO.pure(rec.value)).take(4).compile.toList.unsafeRunSync
         receivedMessages must contain theSameElementsAs messagesToPublish
@@ -37,7 +37,7 @@ class KafkaMessageConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKa
     }
 
     "get stream of deserialized events" in {
-      import KafkaMessageConsumer._
+      import KafkaFS2Consumer._
 
       withRunningKafkaOnFoundPort(embeddedKafkaConfig) { _ =>
         val eventsToPublish = List(
@@ -47,7 +47,7 @@ class KafkaMessageConsumerSpec extends AnyWordSpec with Matchers with EmbeddedKa
         )
         eventsToPublish.foreach(m => publishToKafka[String, String](topic, "key", m))
 
-        val consumer = KafkaMessageConsumer[IO, String, Event](config)
+        val consumer = KafkaFS2Consumer[IO, String, Event](config)
 
         val receivedMessages = consumer.streamFrom(topic).evalMap(rec => IO.pure(rec.value)).take(3).compile.toList.unsafeRunSync()
         receivedMessages must be (List(Event("e1", "event 1"), Event("e2", "event 2"), Event("e3", "event 3")))

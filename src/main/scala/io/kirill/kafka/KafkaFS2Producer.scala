@@ -1,14 +1,14 @@
 package io.kirill.kafka
 
 import cats.effect.{ConcurrentEffect, ContextShift, Sync}
-import fs2.kafka.{produce, ProducerRecord, ProducerRecords, ProducerSettings, Serializer}
+import fs2.kafka.{ProducerRecord, ProducerRecords, ProducerSettings, Serializer, produce}
 import fs2._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.kirill.configs.KafkaConfig
 import io.kirill.event.Event
 
-class KafkaMessageProducer[F[_]: ConcurrentEffect: ContextShift, K, V] private (
+class KafkaFS2Producer[F[_]: ConcurrentEffect: ContextShift, K, V] private(
     config: KafkaConfig
 )(implicit ks: Serializer[F, K], vs: Serializer[F, V]) {
 
@@ -25,13 +25,13 @@ class KafkaMessageProducer[F[_]: ConcurrentEffect: ContextShift, K, V] private (
         .evalMap(_ => Sync[F].pure(()))
 }
 
-object KafkaMessageProducer {
+object KafkaFS2Producer {
   implicit def eventSerializer[F[_]: Sync]: Serializer[F, Event] = Serializer.instance[F, Event] { (_, _, event) =>
     Sync[F].delay(event.asJson.noSpaces.getBytes("UTF-8"))
   }
 
   def apply[F[_]: ConcurrentEffect: ContextShift, K, V](
       config: KafkaConfig
-  )(implicit ks: Serializer[F, K], vs: Serializer[F, V]): KafkaMessageProducer[F, K, V] =
-    new KafkaMessageProducer[F, K, V](config)
+  )(implicit ks: Serializer[F, K], vs: Serializer[F, V]): KafkaFS2Producer[F, K, V] =
+    new KafkaFS2Producer[F, K, V](config)
 }
