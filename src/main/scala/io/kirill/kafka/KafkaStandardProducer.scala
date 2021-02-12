@@ -34,12 +34,12 @@ object KafkaStandardProducer {
       implicit kd: Serializer[K],
       vd: Serializer[V]
   ): Resource[F, KafkaStandardProducer[F, K, V]] = {
-    val acquireProducer = {
+    val acquireProducer = Sync[F].delay {
       val props = new Properties()
       props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.servers)
       props.put(ProducerConfig.ACKS_CONFIG, "all")
       props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4")
-      Sync[F].delay(new KafkaProducer[K, V](props))
+      new KafkaProducer[K, V](props)
     }
 
     Resource
